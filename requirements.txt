@@ -9,3 +9,8 @@ langchain-community
 crewai
 crewai[tools]
 open-interpreter
+ollama
+tqdm
+edge-tts
+pydub
+pyaudio
