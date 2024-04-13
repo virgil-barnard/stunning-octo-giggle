@@ -89,5 +89,8 @@ pip3 --version
    - Make sure to replace `<repository_url>` and `<repository_name>` with the actual URL and name of your repository.
    - Using a virtual environment is recommended to avoid conflicts with system-wide Python packages.
    - You can install additional packages later using `pip install <package_name>` or by adding them to your `requirements.txt` file and running `pip install -r requirements.txt`.
+  
+7. **For speak:**
+   sudo apt install espeak
 
 That's it! You now have a Python environment set up and ready for your project. Happy coding!
