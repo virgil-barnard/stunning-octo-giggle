@@ -1,0 +1,11 @@
+jupyterlab
+scikit-learn
+matplotlib
+duckduckgo-search
+beautifulsoup4
+streamlit
+langchain-openai
+langchain-community
+crewai
+crewai[tools]
+open-interpreter
