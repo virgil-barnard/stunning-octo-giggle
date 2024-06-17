@@ -1,0 +1,85 @@
+When autonomous AI comes online, it will likely have to search for its sensors and appendages that it has control over. Can you write an Abstract Python class that has the variables and methods required for recognizing which sensors and appendages it has and sets up communication channels with them?
+
+Certainly! Here is an example of an abstract Python class that could be used to represent an autonomous AI that has control over various sensors and appendages:
+
+from abc import ABC, abstractmethod
+
+class AutonomousAI(ABC):
+    def __init__(self):
+        self.sensors = []
+        self.appendages = []
+
+    def discover_sensors(self):
+        """
+        Search for and identify all available sensors.
+        """
+        pass
+
+    def discover_appendages(self):
+        """
+        Search for and identify all available appendages.
+        """
+        pass
+
+    def setup_communication(self, device):
+        """
+        Set up a communication channel with the specified device.
+        """
+        pass
+
+    @abstractmethod
+    def run(self):
+        """
+        Main loop for the autonomous AI.
+        """
+        pass
+
+The AutonomousAI class has three methods that can be used to discover and communicate with sensors and appendages: discover_sensors, discover_appendages, and setup_communication. It also has an abstract method called run which represents the main loop for the autonomous AI. This method would need to be implemented by a subclass of AutonomousAI in order to define the specific behavior of the AI.
+
+The sensors and appendages variables are lists that will be used to store the identified sensors and appendages, respectively. The discover_sensors and discover_appendages methods can be implemented in a subclass to search for and identify available sensors and appendages, and add them to the appropriate list. The setup_communication method can be used to set up a communication channel with a specific device, once it has been identified.
+
+I hope this helps! Let me know if you have any questions.
+virgil.barnard@gmail.com
+Can you create a subclass of the AutonomousAI class that overrides the discover_sensors method by looking for the existence of a microphone, camera or antenna? 
+
+Certainly! Here is an example of a subclass of the AutonomousAI class that overrides the discover_sensors method to search for a microphone, camera, and antenna:
+
+class MyAI(AutonomousAI):
+    def discover_sensors(self):
+        """
+        Search for and identify all available sensors.
+        """
+        # Search for microphone
+        if self.detect_microphone():
+            self.sensors.append("microphone")
+
+        # Search for camera
+        if self.detect_camera():
+            self.sensors.append("camera")
+
+        # Search for antenna
+        if self.detect_antenna():
+            self.sensors.append("antenna")
+
+    def detect_microphone(self):
+        """
+        Detect the presence of a microphone.
+        """
+        # Implementation details will depend on the specific hardware being used
+        pass
+
+    def detect_camera(self):
+        """
+        Detect the presence of a camera.
+        """
+        # Implementation details will depend on the specific hardware being used
+        pass
+
+    def detect_antenna(self):
+        """
+        Detect the presence of an antenna.
+        """
+        # Implementation details will depend on the specific hardware being used
+        pass
+
+The MyAI subclass overrides the discover_sensors method by calling three helper methods: detect_microphone, detect_camera, and detect_antenna. These methods can be implemented to search for the presence of a microphone, camera, and antenna, respectively. The specific implementation details will 
