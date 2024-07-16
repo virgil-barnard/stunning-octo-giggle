@@ -1,0 +1,206 @@
+Info for "Master":
+Index: 0
+Serial number: 0000000000000000a06063c82487915f
+Board ID Number: 2 (HackRF One)
+Firmware Version: git-b4a452c (API:1.03)
+Part ID Number: 0xa000cb3c 0x005d475d
+
+Info for "Slave": 
+Index: 1
+Serial number: 0000000000000000a06063c8231f945f
+Board ID Number: 2 (HackRF One)
+Firmware Version: git-b4a452c (API:1.03)
+Part ID Number: 0xa000cb3c 0x00574762
+
+Checking firmware version we see that b4a452c was made in 2018. 
+We read documentation for updating at:
+https://hackrf.readthedocs.io/en/latest/updating_firmware.html
+
+We collect a new firmware update with:
+wget -c https://github.com/greatscottgadgets/hackrf/releases/download/v2022.09.1/hackrf-2022.09.1.tar.xz && tar -xzf hackrf-2022.09.1.tar.xz -C ~/Downloads/
+But this didn't work so I downloaded through browser...
+
+Next, decompress the file:
+tar -xf ~/Downloads/hackrf-2022.09.1.tar.xz 
+
+Then run hackrf_spiflash while pointing to the usb.bin file:
+hackrf_spiflash -w ~/Downloads/hackrf-2022.09.1/firmware-bin/hackrf_one_usb.bin
+
+We see:
+pi@raspberrypi:~ $ hackrf_spiflash -w ~/Downloads/hackrf-2022.09.1/firmware-bin/hackrf_one_usb.bin
+File size 38224 bytes.
+Erasing SPI flash.
+Writing 38224 bytes at 0x000000.
+
+Checking hackrf_info we get:
+pi@raspberrypi:~ $ hackrf_info
+hackrf_info version: unknown
+libhackrf version: unknown (0.5)
+Found HackRF
+Index: 0
+Serial number: 0000000000000000a06063c82487915f
+Board ID Number: 2 (HackRF One)
+Firmware Version: 2022.09.1 (API:1.06)
+Part ID Number: 0xa000cb3c 0x005d475d
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+
+Found HackRF
+Index: 1
+Serial number: 0000000000000000a06063c8231f945f
+Board ID Number: 2 (HackRF One)
+Firmware Version: git-b4a452c (API:1.03)
+Part ID Number: 0xa000cb3c 0x00574762
+
+This indicates that only one of them has been reflashed.pi@raspberrypi:~ $ hackrf_info
+hackrf_info version: unknown
+libhackrf version: unknown (0.5)
+Found HackRF
+Index: 0
+Serial number: 0000000000000000a06063c8231f945f
+Board ID Number: 2 (HackRF One)
+Firmware Version: 2022.09.1 (API:1.06)
+Part ID Number: 0xa000cb3c 0x00574762
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+
+So we unplug the updated HackRF (Master in this case),
+by unplugging Master and running spiflash again. 
+When we reset the HackRF (after relashing) we see:
+pi@raspberrypi:~ $ hackrf_info
+hackrf_info version: unknown
+libhackrf version: unknown (0.5)
+Found HackRF
+Index: 0
+Serial number: 0000000000000000a06063c8231f945f
+Board ID Number: 2 (HackRF One)
+Firmware Version: 2022.09.1 (API:1.06)
+Part ID Number: 0xa000cb3c 0x00574762
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+
+Plugging the slave back in and doing hackrf_info we get:
+pi@raspberrypi:~ $ hackrf_info
+hackrf_info version: unknown
+libhackrf version: unknown (0.5)
+Found HackRF
+Index: 0
+Serial number: 0000000000000000a06063c82487915f
+Board ID Number: 2 (HackRF One)
+Firmware Version: 2022.09.1 (API:1.06)
+Part ID Number: 0xa000cb3c 0x005d475d
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+
+Found HackRF
+Index: 1
+Serial number: 0000000000000000a06063c8231f945f
+Board ID Number: 2 (HackRF One)
+Firmware Version: 2022.09.1 (API:1.06)
+Part ID Number: 0xa000cb3c 0x00574762
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+Operacake found, address: 0xff
+
+Next, we note that apparently: "Older versions of HackRF firmware 
+(prior to release 2021.03.1) require an additional step to program 
+a bitstream into the CPLD."
+
+We do:
+hackrf_cpldjtag -x ~/Downloads/hackrf-2022.09.1/firmware/cpld/sgpio_if/default.xsvf
+
+Then reset the Master to complete the process. 
+Then we unplug Master and repeat for slave.
+
+
+
+Now we can proceed with syncing the HackRF's according to documentation for Hardware Triggering:
+Setup for slave:
+hackrf_transfer -H -d 0000000000000000a06063c8231f945f -a 0 -l 32 -g 32 -r rx1.cs8
+
+Setup for master:
+hackrf_transfer -d 0000000000000000a06063c82487915f -a 0 -l 32 -g 32 -r rx2.cs8
+
+Combine arguments into one command (as per https://github.com/greatscottgadgets/hackrf/pull/381):
+hackrf_transfer -r rx1.cs8 -d 0000000000000000a06063c8231f945f -H 1 -n 5120000 | hackrf_transfer -r rx2.cs8 -d 0000000000000000a06063c82487915f -H 1 -n 5120000
+-or-
+hackrf_transfer -H 1 -r rx1.cs8 -d 0000000000000000a06063c8231f945f -n 95000000 -a 0 -g 32 -l 32 -f 2400:2490 | hackrf_transfer -H 0 -r rx2.cs8 -d 0000000000000000a06063c82487915f -n 95000000 -a 0 -g 32 -l 32 -f 2400:2490
+
+
+We get:
+pi@raspberrypi:~ $ hackrf_transfer -r rx1.cs8 -d 0000000000000000a06063c8231f945f -H 1 -n 5120000 | hackrf_transfer -r rx2.cs8 -d 0000000000000000a06063c82487915f -H 1 -n 5120000
+call hackrf_set_sample_rate(10000000 Hz/10.000 MHz)
+call hackrf_set_hw_sync_mode(1)
+call hackrf_set_freq(900000000 Hz/900.000 MHz)
+samples_to_xfer 5120000/5Mio
+Stop with Ctrl-C
+call hackrf_set_sample_rate(10000000 Hz/10.000 MHz)
+call hackrf_set_hw_sync_mode(1)
+call hackrf_set_freq(900000000 Hz/900.000 MHz)
+samples_to_xfer 5120000/5Mio
+Stop with Ctrl-C
+10.5 MiB / 1.000 sec = 10.5 MiB/second
+
+Exiting... hackrf_is_streaming() result: streaming terminated (-1004)
+Total time: 1.00048 s
+hackrf_stop_rx() done
+hackrf_close() done
+hackrf_exit() done
+fclose(fd) done
+exit
+10.5 MiB / 1.004 sec = 10.4 MiB/second
+
+Exiting... hackrf_is_streaming() result: streaming terminated (-1004)
+Total time: 1.00394 s
+hackrf_stop_rx() done
+hackrf_close() done
+hackrf_exit() done
+fclose(fd) done
+exit
+
+Next we download gqrx in the applications directory of the raspberry.
+This requires sudo password.
+
+# Added Nooelec TCXO chip for clock upgrade. 
+# To check if working: 
+# hackrf_debug --si5351c -n 0 -r
+# -> [  0] -> 0x01
+
+# To enable host/client behaviour for data collections:
+# sudo apt-get update
+# sudo apt-get install openssh-server
+# sudo service ssh start
+
+# To enable ssh password input to control transmitter:
+# sudo apt update
+# sudo apt install sshpass
+
